@@ -29,8 +29,6 @@ export function CartItem({ product }: Product): JSX.Element {
 
   const subTotal = price * amount;
 
-  console.log({ product })
-
   function handleProductIncrement() {
     updateProductAmount({
       productId: id,

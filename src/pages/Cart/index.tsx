@@ -30,7 +30,7 @@ const Cart = (): JSX.Element => {
         </thead>
         <tbody>
           {sortedArray.map((product) =>
-            <CartItem product={product} />
+            <CartItem key={product.id} product={product} />
           )}
         </tbody>
       </ProductTable>

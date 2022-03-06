@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '../services/api';
 import { Product, Stock } from '../types';
@@ -45,7 +45,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         return;
       }
 
-      const hasProductAdded = cart.filter((product) => product.id === productId)[0];
+      const hasProductAdded = cart.find((product) => product.id === productId);
       if (hasProductAdded) {
         updateProductAmount({ productId, amount: hasProductAdded.amount + 1 })
         return;
@@ -63,6 +63,8 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
+      const isValidProduct = cart.find((product) => product.id === productId);
+      if (!isValidProduct) throw new Error();
       handleUpdateCartState(cart.filter((product) => product.id !== productId));
     } catch {
       toast.error('Erro na remoção do produto');
@@ -74,17 +76,20 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     amount,
   }: UpdateProductAmount) => {
     try {
-      if (amount === 0) return;
+      if (amount <= 0) return;
 
       const { data: stockValue } = await api.get(`stock/${productId}`);
-      if (stockValue.amount <= amount) {
+      if (amount > stockValue.amount) {
         toast.error('Quantidade solicitada fora de estoque');
         return;
       }
 
       const { data: productData } = await api.get(`products/${productId}`);
+      const productExist = cart.find(product => product.id === productId);
+      if (!productExist) throw new Error();
+
       handleUpdateCartState([
-        ...cart.filter((product) => product.id !== productData.id),
+        ...cart.filter((product) => product.id !== productId),
         {
           ...productData,
           amount,
