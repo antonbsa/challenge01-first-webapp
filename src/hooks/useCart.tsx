@@ -56,7 +56,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         ...productData,
         amount: 1,
       }]);
-      toast.success('Item adicionado!');
     } catch {
       toast.error('Erro na adição do produto');
     }
@@ -65,7 +64,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
   const removeProduct = (productId: number) => {
     try {
       handleUpdateCartState(cart.filter((product) => product.id !== productId));
-      toast.success('Item Removido!');
     } catch {
       toast.error('Erro na remoção do produto');
     }
@@ -79,7 +77,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       if (amount === 0) return;
 
       const { data: stockValue } = await api.get(`stock/${productId}`);
-      if (stockValue.amount <= 0) {
+      if (stockValue.amount <= amount) {
         toast.error('Quantidade solicitada fora de estoque');
         return;
       }
@@ -92,7 +90,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           amount,
         }
       ]);
-      toast.success('Item Atualizado!');
     } catch {
       toast.error('Erro na alteração de quantidade do produto');
     }
